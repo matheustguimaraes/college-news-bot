@@ -19,9 +19,7 @@ exports.scrape = (url, html) => {
   let lastNews = $("tr.item:nth-child(1) > td > a:nth-child(1)");
   return {
     error: false,
-    lastNews: {
-      headline: lastNews.text().trim(),
-      link: url + lastNews.attr("href"),
-    },
+    headline: lastNews.text().trim(),
+    link: url + lastNews.attr("href"),
   };
 };
