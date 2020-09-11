@@ -3,40 +3,60 @@ const crawler = require("./news");
 
 require("dotenv").config();
 
-const url = "http://www.ufc.br/noticias";
-
 const bot = new Telegraf(process.env.BOT_TOKEN);
+
+const NEWS_URL = "http://www.ufc.br/noticias";
+const CHANNEL = "@noticiasUFC";
+
+const WAIT_TIME = 300;
 
 const requestLoop = async () => {
   try {
-    const response = await crawler.access(url);
-    let news = crawler.scrape(url, response);
+    const response = await crawler.access(NEWS_URL);
+    let news = crawler.scrape(NEWS_URL, response);
     return news;
   } catch (error) {
-    console.log(error.response);
+    return;
   }
 };
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function sleep(seconds) {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
-async function checkNews() {
-  lastNews1 = await requestLoop();
-  console.log("1", lastNews1);
+async function main() {
+  bot.launch();
 
-  await sleep(2000);
+  while (true) {
+    news1 = await requestLoop();
 
-  lastNews2 = await requestLoop();
-  console.log("2", lastNews2);
+    var currentdate = new Date();
+    var datetime =
+      currentdate.getDate() +
+      "/" +
+      (currentdate.getMonth() + 1) +
+      "/" +
+      currentdate.getFullYear() +
+      " @ " +
+      currentdate.getHours() +
+      ":" +
+      currentdate.getMinutes() +
+      ":" +
+      currentdate.getSeconds();
+
+    console.log(`[${datetime}]`, news1.headline);
+
+    await sleep(WAIT_TIME);
+
+    news2 = await requestLoop();
+
+    if (news1.headline !== news2.headline) {
+      console.log(`[${datetime}] nova noticia`);
+
+      const message = `${news2.headline}\n${news2.link}`;
+      bot.telegram.sendMessage(CHANNEL, message);
+    }
+  }
 }
 
-interval = setInterval(() => {
-  checkNews();
-}, 5000);
-
-bot.start((ctx) => ctx.reply("Welcome!"));
-bot.help((ctx) => ctx.reply("Send me a sticker"));
-bot.on("sticker", (ctx) => ctx.reply("👍"));
-bot.hears("hi", (ctx) => ctx.reply("Hey there"));
-bot.launch();
+main();
