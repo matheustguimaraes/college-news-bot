@@ -8,7 +8,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 const NEWS_URL = "http://www.ufc.br/noticias";
 const CHANNEL = "@noticiasUFC";
 
-const WAIT_TIME = 300;
+const WAIT_TIME = 60;
 
 const requestLoop = async () => {
   try {
