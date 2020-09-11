@@ -1,8 +1,10 @@
+const express = require("express");
 const Telegraf = require("telegraf");
 const crawler = require("./news");
 
 require("dotenv").config();
 
+const app = express();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const NEWS_URL = "http://www.ufc.br/noticias";
@@ -59,4 +61,8 @@ async function main() {
   }
 }
 
-main();
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  main();
+  console.log(`bot running in port ${port}`);
+});
