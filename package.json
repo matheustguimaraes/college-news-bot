@@ -1,19 +1,35 @@
 {
-  "name": "ufcbr-telegram",
+  "name": "noticiasufc-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bot for sending news from the Federal University of Ceará to the telegram channel @noticiasUFC",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "bugs": {
+    "url": "https://matheustguimaraes/noticiasufc-bot/issues"
+  },
+  "author": {
+    "name": "Matheus T. Guimarães",
+    "email": "matheusguimr@gmail.com",
+    "url": "https://matheustguimaraes.com"
+  },
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.20.0",
     "cheerio": "^1.0.0-rc.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "telegraf": "^3.38.0"
+  },
+  "keywords": [
+    "bot",
+    "telegram",
+    "web scrapper"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/matheustguimaraes/noticiasufc-bot.git"
   }
 }
