@@ -21,7 +21,7 @@ async function getNews(url) {
     let news = crawler.scrape(url, response);
     return news;
   } catch (error) {
-    return;
+    return { error: true };
   }
 }
 
@@ -43,28 +43,65 @@ function getTime() {
   return datetime;
 }
 
+async function sendNews(news) {
+  let message = `${news.headline}\n${news.link}`;
+  sentMessage = await bot.telegram.sendMessage(CHANNEL, message);
+
+  return sentMessage;
+}
+
+async function changeHeadline(newMsg, sentMsg) {
+  bot.telegram.deleteMessage(CHANNEL, sentMsg.message_id);
+
+  return await sendNews(newMsg);
+}
+
 async function main() {
   bot.launch();
 
+  sentMessage = false;
   while (true) {
     let news1 = await getNews(NEWS_URL);
 
     datetime = getTime();
 
-    console.log(`[${datetime}]`, news1.headline);
-
     await sleep(WAIT_TIME);
 
     let news2 = await getNews(NEWS_URL);
 
-    if (news1.headline !== news2.headline) {
-      console.log(`[${datetime}] nova noticia:`, news2.headline);
+    if (news1.error || news2.error) {
+      continue;
+    }
 
-      let message = `${news2.headline}\n${news2.link}`;
-      bot.telegram.sendMessage(CHANNEL, message);
+    console.log(`[${datetime}]`, news1.headline);
+
+    if (news1.link !== news2.link) {
+      console.log(`[${datetime}] nova noticia:`, news2.headline);
+      sentMessage = await sendNews(news2);
+    } else if (
+      news1.link === news2.link &&
+      news1.headline !== news2.headline &&
+      !sentMessage
+    ) {
+      console.log(`[${datetime}] headline alterada:`, news2.headline);
+      sentMessage = await changeHeadline(news2, sentMessage);
     }
   }
 }
+
+app.get("/", function (req, res) {
+  res.send(`<pre>
+##::: ##::'#######::'########:'####::'######::'####::::'###:::::'######::'##::::'##:'########::'######::
+###:: ##:'##.... ##:... ##..::. ##::'##... ##:. ##::::'## ##:::'##... ##: ##:::: ##: ##.....::'##... ##:
+####: ##: ##:::: ##:::: ##::::: ##:: ##:::..::: ##:::'##:. ##:: ##:::..:: ##:::: ##: ##::::::: ##:::..::
+## ## ##: ##:::: ##:::: ##::::: ##:: ##:::::::: ##::'##:::. ##:. ######:: ##:::: ##: ######::: ##:::::::
+##. ####: ##:::: ##:::: ##::::: ##:: ##:::::::: ##:: #########::..... ##: ##:::: ##: ##...:::: ##:::::::
+##:. ###: ##:::: ##:::: ##::::: ##:: ##::: ##:: ##:: ##.... ##:'##::: ##: ##:::: ##: ##::::::: ##::: ##:
+##::. ##:. #######::::: ##::::'####:. ######::'####: ##:::: ##:. ######::. #######:: ##:::::::. ######::
+..::::..:::.......::::::..:::::....:::......:::....::..:::::..:::......::::.......:::..:::::::::......:::
+telegram channel <a href="https://t.me/noticiasUFC">noticiasUFC</a>, created by Matheus T. Guimarães (matheustguimaraes.com)
+  </pre>`);
+});
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
