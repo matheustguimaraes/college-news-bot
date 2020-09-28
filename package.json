@@ -2,9 +2,9 @@
   "name": "noticiasufc-bot",
   "version": "1.0.0",
   "description": "Bot for sending news from the Federal University of Ceará to the telegram channel @noticiasUFC",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bugs": {
